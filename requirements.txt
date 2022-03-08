@@ -1,0 +1,7 @@
+flask
+keras
+face-recognition
+opencv-python
+numpy
+tensorflow
+mediapipe
