@@ -8,6 +8,7 @@ import cv2
 import numpy as np
 import sys
 
+from datetime import datetime
 import mediapipe as mp
 
 mpHands = mp.solutions.hands
@@ -60,10 +61,11 @@ def predict():
     files = list(request.files.items())
     if len(files) != 1:
         return {"status": "error", "message": "Please upload one image"}
-    
-    for i in range(len(files)):
-        f = request.files[files[i][0]]
-        f.save(os.path.join(uploads_dir, f.filename))
+
+    f = files[0][1]
+    filename = f.filename
+    filename = filename.split(".")[0] + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + "." + filename.split(".")[1] 
+    f.save(os.path.join(uploads_dir, filename))
     
     CATEGORY_MAP = {
         "blank": 0,
@@ -105,18 +107,18 @@ def predict():
                 cropped_image = frame[y1-50:y2+50,x1-50:x2+50]
                 cv2.imwrite(file, cropped_image)
             return True
-        except:
+        except Exception as e:
             pass
 
         return False
-        
-    hand_detect = get_hand(f"./uploads/{files[0][1].filename}")
+    
+    hand_detect = get_hand(f"./uploads/{filename}")
     print(hand_detect)
     if not hand_detect:
         return {"status":"error","message":"Hand not detected"}
 
     # Ensuring the input image has same dimensions that is used during training. 
-    img = cv2.imread(f"./uploads/{files[0][1].filename}")
+    img = cv2.imread(f"./uploads/{filename}")
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (225, 225))
 
@@ -126,9 +128,8 @@ def predict():
     gesture_name = mapper(gesture_numeric)
     print(gesture_name)
     
-    for i in range(len(files)):
-        profile = request.files[files[i][0]]
-        os.remove(os.path.join(uploads_dir, profile.filename))
+    # remove the saved file
+    os.remove(os.path.join(uploads_dir, filename))
     
     return {"status":"success", "message": gesture_name}
 
