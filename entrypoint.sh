@@ -1,3 +1,2 @@
 #!/bin/sh
-
-python3 app.py 
+gunicorn app:app 0.0.0.0:$PORT
