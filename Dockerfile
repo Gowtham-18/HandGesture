@@ -1,4 +1,4 @@
-from python:alpine
+FROM docker-tensorflow-opencv
 
 WORKDIR /opt/app
 COPY . .
