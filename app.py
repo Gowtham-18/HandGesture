@@ -136,6 +136,11 @@ def predict():
 @app.route('/ml/<path:path>')
 def send_file(path):
     return send_from_directory('.', path)
+
+@app.route("/")
+def index():
+    return "Hello world"
+
 if   __name__ == "__main__" :
     app.run(host="0.0.0.0",port=5000,debug=True)
 
